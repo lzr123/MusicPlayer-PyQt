@@ -1,5 +1,5 @@
 from PlayControl import Ui_MainWindow
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui, Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSlot, QTimer, QtDebugMsg
 from PyQt5.QtWidgets import QFileDialog, QSlider
@@ -15,10 +15,13 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
         self.show()
 
     def initUi(self):
+        self.setFixedSize(self.width(), self.height())
+
         self.is_playing = False
         self.song_len_time = '0:0'
 
         self.player = QMediaPlayer()
+        self.player.setObjectName('musicPlayer')
         self.play_list = QMediaPlaylist()
 
         self.timer = QTimer()
@@ -28,6 +31,13 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
 
         self.playModePanel.setVisible(False)
         self.playModePanel.setEnabled(False)
+
+        self.volPanel.setVisible(False)
+        self.volPanel.setEnabled(False)
+
+        self.volChangeSlider.setRange(0, 100)
+        self.volChangeSlider.setValue(100)
+        self.current_vol = 100
 
         self.openFileButton.clicked.connect(self.openFile)
 
@@ -39,9 +49,11 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
 
         self.player.durationChanged.connect(self.calcTotalTime)
 
-        self.playPosSlider.sliderMoved.connect(self.dragSlider)
+        self.player.mediaStatusChanged.connect(self.nextSong)
 
-        self.playPosSlider.sliderReleased.connect(self.sliderRelease)
+        self.playPosSlider.sliderMoved.connect(self.dragPosSlider)
+
+        self.playPosSlider.sliderReleased.connect(self.posSliderRelease)
 
         self.timer.timeout.connect(self.showTime)
 
@@ -52,6 +64,12 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
         self.itemOncePlay.clicked.connect(self.setPlayMode)
 
         self.randomPlay.clicked.connect(self.setPlayMode)
+
+        self.volChangeButton.clicked.connect(self.showVolPanel)
+
+        self.muteButton.clicked.connect(self.setMute)
+
+        self.volChangeSlider.sliderMoved.connect(self.setVolume)
 
 
 
@@ -107,8 +125,12 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
             self.timer.start()
 
     def nextSong(self):
-        self.play_list.next()
-        self.playSong()
+        sender = self.sender()
+
+        if (sender.objectName() == 'musicPlayer' and sender.mediaStatus() == sender.EndOfMedia) or \
+                sender.objectName() == 'nextSongButton':
+            self.play_list.next()
+            self.playSong()
         # song_count = self.play_list.mediaCount()
         # current_song_index = self.play_list.currentIndex()
         # if current_song_index + 1 < song_count:
@@ -146,14 +168,11 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
 
             self.playPosSlider.setRange(0, 1000)
 
-    def changeSlider(self):
-        self.playPosSlider.setTickPosition(self.player.position()*1000//self.player.duration())
-
-    def dragSlider(self):
+    def dragPosSlider(self):
         self.timer.stop()
 
 
-    def sliderRelease(self):
+    def posSliderRelease(self):
         self.player.pause()
         self.player.setPosition(self.playPosSlider.value() * self.player.duration() // 1000)
         self.player.play()
@@ -163,8 +182,12 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
 
     def showPlayModePanel(self):
 
-        self.playModePanel.setEnabled(True)
-        self.playModePanel.setVisible(True)
+        if self.playModePanel.isEnabled():
+            self.playModePanel.setEnabled(False)
+            self.playModePanel.setVisible(False)
+        else:
+            self.playModePanel.setEnabled(True)
+            self.playModePanel.setVisible(True)
 
     def setPlayMode(self):
         sender = self.sender()
@@ -181,3 +204,26 @@ class PlayControlAction(QMainWindow, Ui_MainWindow):
 
         self.playModePanel.setVisible(False)
         self.playModePanel.setEnabled(False)
+
+    def showVolPanel(self):
+
+        if self.volPanel.isEnabled():
+            self.volPanel.setEnabled(False)
+            self.volPanel.setVisible(False)
+        else:
+            self.volPanel.setEnabled(True)
+            self.volPanel.setVisible(True)
+
+    def setMute(self):
+        if not self.player.isMuted():
+            self.player.setMuted(True)
+            self.volChangeSlider.setValue(0)
+        else:
+            self.player.setMuted(False)
+            self.player.setVolume(self.current_vol)
+            self.volChangeSlider.setValue(self.current_vol)
+
+    def setVolume(self):
+        self.player.setMuted(False)
+        self.player.setVolume(self.volChangeSlider.value())
+        self.current_vol = self.volChangeSlider.value()
