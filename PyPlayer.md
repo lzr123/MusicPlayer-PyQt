@@ -62,6 +62,8 @@
      + 9.1 Event controlled
      + 9.2 Using timer to get playing time
 
+     ![FSM of Player](H:\Projects\PyCharmProjects\MusicPlayer\PlayerFSM.png)
+
 ##### Advance
 
    	1. Play style
