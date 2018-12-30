@@ -1,0 +1,14 @@
+{
+  "initParams":
+  {
+    "LocalMusicDirs": ["./Music/"]
+  },
+  "lastPlayParams":
+  {
+    "Playlist": "initList",
+    "PlayMode": "SEQ",
+    "PlayMusic": "",
+    "PlayProcess": 0,
+    "Volume": 10
+  }
+}

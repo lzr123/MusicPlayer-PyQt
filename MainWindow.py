@@ -38,6 +38,19 @@ class Ui_MainWindow(object):
         self.exitButton.setText("")
         self.exitButton.setObjectName("exitButton")
         self.gridLayout.addWidget(self.exitButton, 0, 1, 1, 1)
+        self.playButton = QtWidgets.QPushButton(self.centralwidget)
+        self.playButton.setGeometry(QtCore.QRect(600, 1080, 71, 41))
+        self.playButton.setObjectName("playButton")
+        self.prevButton = QtWidgets.QPushButton(self.centralwidget)
+        self.prevButton.setGeometry(QtCore.QRect(510, 1080, 71, 41))
+        self.prevButton.setObjectName("prevButton")
+        self.nextButton = QtWidgets.QPushButton(self.centralwidget)
+        self.nextButton.setGeometry(QtCore.QRect(690, 1080, 71, 41))
+        self.nextButton.setObjectName("nextButton")
+        self.playProgressBar = QtWidgets.QSlider(self.centralwidget)
+        self.playProgressBar.setGeometry(QtCore.QRect(510, 1060, 251, 16))
+        self.playProgressBar.setOrientation(QtCore.Qt.Horizontal)
+        self.playProgressBar.setObjectName("playProgressBar")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1366, 18))
@@ -53,4 +66,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Player"))
+        self.playButton.setText(_translate("MainWindow", "Pause"))
+        self.prevButton.setText(_translate("MainWindow", "<-"))
+        self.nextButton.setText(_translate("MainWindow", "->"))
 
